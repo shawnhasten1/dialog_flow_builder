@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper" id="wrapper" @mousedown="setMouseDown($event)" @mouseup="setMouseUp()" @mousemove="dragBackground($event); dragBackgroundCard($event);">
     <div id="holder_drag" :style="{'transform':'translate('+holder.pos_x+'px,'+holder.pos_y+'px)'}">
-      <CardTile v-for="(item, index) in cards" :key="item" :transform="item" @mousedown="setMouseDownCard($event, index)" @mouseup="setMouseUpCard($event)"/>
+      <CardTile v-for="(item, index) in cards" :key="item" :transform="item" @mousedown="setMouseDownCard($event, index)" @mouseup="setMouseUpCard($event)" :style="{'z-index':item.z_index}"/>
     </div>
   </div>
 </template>
@@ -18,6 +18,7 @@ export default {
     return {
       mouse_down:false,
       is_card_blocker:false,
+      top_z_index:1,
       mouse_positions:{
         start_x:0,
         start_y:0
@@ -28,12 +29,14 @@ export default {
       },
       cards:[
         {
-          'pos_x':0, 
-          'pos_y':0,
+          pos_x:0, 
+          pos_y:0,
+          z_index:0
         },
         {
-          'pos_x':400, 
-          'pos_y':0,
+          pos_x:400, 
+          pos_y:0,
+          z_index:0
         }
       ]
     }
@@ -71,9 +74,14 @@ export default {
       this.index = index;
       this.is_card_blocker = true;
 
-      //GET THE START POSITION OF THE MOUSE SO WE CAN OFFSET WHEN MOVE
+      // GET THE START POSITION OF THE MOUSE SO WE CAN OFFSET WHEN MOVE
       this.mouse_positions.start_x = e.clientX;
       this.mouse_positions.start_y = e.clientY;
+
+
+      // PUT THIS CARD ON TOP
+      this.top_z_index += 1;
+      this.cards[this.index]['z_index'] = this.top_z_index;
     },
     setMouseUpCard: function(){
       this.is_card_blocker = false;
