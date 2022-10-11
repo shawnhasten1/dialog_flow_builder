@@ -1,7 +1,7 @@
 <template>
-  <div class="wrapper" id="wrapper" @mousedown="setMouseDown($event)" @mouseup="setMouseUp()" @mousemove="dragBackground($event)">
+  <div class="wrapper" id="wrapper" @mousedown="setMouseDown($event)" @mouseup="setMouseUp()" @mousemove="dragBackground($event); dragBackgroundCard($event);">
     <div id="holder_drag" :style="{'transform':'translate('+holder.pos_x+'px,'+holder.pos_y+'px)'}">
-      <CardTile v-for="(item, index) in cards" :key="item" :transform="item" @mousedown="setMouseDownCard($event)" @mouseup="setMouseUpCard($event)"  @mousemove="dragBackgroundCard($event, index)"/>
+      <CardTile v-for="(item, index) in cards" :key="item" :transform="item" @mousedown="setMouseDownCard($event, index)" @mouseup="setMouseUpCard($event)"/>
     </div>
   </div>
 </template>
@@ -66,8 +66,9 @@ export default {
 
 
     // THIS IS REDUNDANT TO THE ABOVE CODE BUT DON'T HAVE ANYTHING BETTER YET
-    setMouseDownCard: function(e){
+    setMouseDownCard: function(e, index){
       document.getElementById("wrapper").style.cursor = "grabbing";
+      this.index = index;
       this.is_card_blocker = true;
 
       //GET THE START POSITION OF THE MOUSE SO WE CAN OFFSET WHEN MOVE
@@ -79,12 +80,13 @@ export default {
       document.getElementById("wrapper").style.cursor = "default";
       this.mouse_down = false;
       this.is_card_blocker = false;
+      this.index = null;
     },
-    dragBackgroundCard: function(e, index){
-      if(this.is_card_blocker){
+    dragBackgroundCard: function(e){
+      if(this.is_card_blocker && this.index != null){
         //CALCULATE HOW MUCH OUR MOUSE MOVED TO OFFSET THE HOLDER
-        this.cards[index].pos_x += e.clientX - this.mouse_positions.start_x;
-        this.cards[index].pos_y += e.clientY - this.mouse_positions.start_y;
+        this.cards[this.index].pos_x += e.clientX - this.mouse_positions.start_x;
+        this.cards[this.index].pos_y += e.clientY - this.mouse_positions.start_y;
 
         //RESET THE START POSITIONS TO THE NEW MOUSE POSITION
         this.mouse_positions.start_x = e.clientX;
